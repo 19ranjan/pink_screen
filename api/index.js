@@ -9,11 +9,11 @@ import path from 'path';
 dotenv.config();
 import cors from 'cors';
 
-app.use(cors({
-  origin: 'https://pink-screen-frontend.vercel.app',
+// app.use(cors({
+//   origin: 'https://pink-screen-frontend.vercel.app',
   
-}));
-// app.use(cors());
+// }));
+app.use(cors());
 mongoose
   .connect(process.env.MONGO)
   .then(() => {
