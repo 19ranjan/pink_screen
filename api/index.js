@@ -7,7 +7,12 @@ import listingRouter from './routes/listing.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 dotenv.config();
+import cors from 'cors'
 
+app.use(cors({
+  origin: 'https://pink-screen-frontend.vercel.app',
+  credentials: true, 
+}));
 mongoose
   .connect(process.env.MONGO)
   .then(() => {
