@@ -9,11 +9,19 @@ import path from 'path';
 dotenv.config();
 import cors from 'cors';
 
-// app.use(cors({
-//   origin: 'https://pink-screen-frontend.vercel.app',
-  
-// }));
-app.use(cors());
+// Initialize app
+const app = express();
+const __dirname = path.resolve();
+
+// Configure CORS
+app.use(cors({
+  origin: 'https://pink-screen-frontend.vercel.app',  // Allow only your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Specify the allowed methods
+  credentials: true,  // Allow cookies if necessary
+  allowedHeaders: ['Content-Type', 'Authorization'],  // Specify allowed headers
+}));
+
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO)
   .then(() => {
@@ -23,29 +31,24 @@ mongoose
     console.log(err);
   });
 
-  const __dirname = path.resolve();
-
-const app = express();
-
+// Middleware
 app.use(express.json());
-
 app.use(cookieParser());
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000!');
-});
+// Serve frontend from the `client/dist` folder
+app.use(express.static(path.join(__dirname, '/client/dist')));
 
+// Routes
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/listing', listingRouter);
 
-
-app.use(express.static(path.join(__dirname, '/client/dist')));
-
+// Handle all other routes (SPA)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
-})
+});
 
+// Error handling middleware
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
@@ -54,4 +57,9 @@ app.use((err, req, res, next) => {
     statusCode,
     message,
   });
+});
+
+// Start server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000!');
 });
